@@ -1,19 +1,19 @@
 const TEAMS = {
   team1: {
-    name: "Команда А",
+    name: "Tím A",
     riddles: [
       {
         id: 1,
         image: "images/place1.jpg",
-        question: "Загадка 1: текст загадки здесь. Можно использовать числа, слова, подсказки к локации.",
-        answer: "1234",
+        question: "Som pamätník so symbolikou Svätej Trojice, som jeden z najznámejších barokových pamätníkov v Trenčíne. Ako sa volám? Príď ku mne, aby si začal hľadanie pokladu.",
+        answer: "5500",
         hint: "Текст подсказки для загадки 1. Появляется через 10 минут.",
       },
       {
         id: 2,
         image: "images/place2.jpg",
         question: "Загадка 2: текст загадки здесь.",
-        answer: "алматы",
+        answer: "5500",
         hint: "Текст подсказки для загадки 2.",
       },
       {
@@ -26,7 +26,7 @@ const TEAMS = {
     ],
   },
   team2: {
-    name: "Команда Б",
+    name: "Tím B",
     riddles: [
       {
         id: 1,

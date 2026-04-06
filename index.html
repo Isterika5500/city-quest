@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="sk">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <meta name="theme-color" content="#0d0d0f" />
+  <meta name="theme-color" content="#0b1220" />
   <title>City Quest</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
@@ -11,67 +11,70 @@
 
 <div id="app">
 
-  <!-- ── ЭКРАН: СТАРТ ─────────────────────────────────── -->
+  <!-- ── ŠTART ─────────────────────────────────── -->
   <div id="screen-start" class="screen">
     <div class="start-logo">City Quest</div>
-    <h1 class="start-title">Городской<br/>квест</h1>
-    <p class="start-subtitle">Решай загадки, находи локации,<br/>первым доберись до финала</p>
+    <h1 class="start-title">Mestská<br/>hra</h1>
+    <p class="start-subtitle">
+      Rieš hádanky, nájdi miesta,<br/>
+      dostaň sa do cieľa ako prvý
+    </p>
 
-    <p class="team-select-label">Выбери команду</p>
+    <p class="team-select-label">Vyber tím</p>
     <div id="team-grid" class="team-grid"></div>
 
-    <button id="btn-start" class="btn-primary" disabled>Начать квест</button>
+    <button id="btn-start" class="btn-primary" disabled>
+      Začať hru
+    </button>
   </div>
 
-  <!-- ── ЭКРАН: ЗАГАДКА ───────────────────────────────── -->
+  <!-- ── HÁDANKA ───────────────────────────────── -->
   <div id="screen-riddle" class="screen">
 
-    <!-- Фото с шапкой -->
     <div class="riddle-image-wrap">
-      <img id="riddle-img" src="" alt="локация" />
+      <img id="riddle-img" src="" alt="miesto" />
       <div id="riddle-img-placeholder" class="riddle-image-placeholder" style="display:none;">
-        Фото локации
+        Fotografia miesta
       </div>
+
       <div class="riddle-header">
         <div class="level-badge">
           <div class="level-badge-dot"></div>
-          <span id="level-badge-text">Загадка 1 из 7</span>
+          <span id="level-badge-text">Hádanka 1 z 7</span>
         </div>
         <div id="timer-badge" class="timer-badge">00:00</div>
       </div>
     </div>
 
-    <!-- Прогресс-бар -->
     <div class="progress-bar-wrap">
       <div id="progress-fill" class="progress-bar-fill" style="width:0%"></div>
     </div>
 
-    <!-- Тело загадки -->
     <div class="riddle-body">
       <p id="riddle-question" class="riddle-question"></p>
 
-      <!-- Ошибка -->
+      <!-- Chyba -->
       <div id="feedback-error" class="feedback-banner">
         <div class="feedback-banner-icon">✕</div>
-        <span>Неверно — попробуйте ещё раз</span>
+        <span>Nesprávne — skús znova</span>
       </div>
 
-      <!-- Предупреждение об оставшихся попытках -->
+      <!-- Pokusy -->
       <p id="attempts-warning" class="attempts-warning"></p>
 
-      <!-- Подсказка -->
+      <!-- Nápoveda -->
       <div id="hint-card" class="hint-card">
-        <div class="hint-card-label">Подсказка</div>
+        <div class="hint-card-label">Nápoveda</div>
         <p id="hint-text" class="hint-card-text"></p>
       </div>
 
-      <!-- Поле ввода -->
+      <!-- Odpoveď -->
       <div class="answer-row">
         <input
           id="answer-input"
           class="answer-input"
           type="text"
-          placeholder="Введите ответ..."
+          placeholder="Zadaj odpoveď..."
           autocomplete="off"
           autocorrect="off"
           autocapitalize="off"
@@ -79,65 +82,87 @@
         />
         <button id="btn-check" class="btn-check">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M4 10h12M11 5l5 5-5 5" stroke="#0d0d0f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 10h12M11 5l5 5-5 5"
+              stroke="#08111f"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"/>
           </svg>
         </button>
       </div>
 
-      <!-- Кнопка подсказки -->
-      <button id="btn-hint" class="btn-hint">Показать подсказку</button>
+      <button id="btn-hint" class="btn-hint">
+        Zobraziť nápovedu
+      </button>
 
-      <!-- Точки прогресса -->
       <div id="dots-row" class="dots-row"></div>
     </div>
 
-    <!-- Оверлей блокировки после 5 попыток -->
+    <!-- Cooldown -->
     <div id="cooldown-overlay">
-      <p class="cooldown-title">Слишком много попыток</p>
+      <p class="cooldown-title">Príliš veľa pokusov</p>
       <div id="cooldown-timer-text" class="cooldown-timer">30</div>
-      <p class="cooldown-sub">Секунд до разблокировки</p>
+      <p class="cooldown-sub">Sekundy do odblokovania</p>
     </div>
   </div>
 
-  <!-- ── ЭКРАН: ВЕРНЫЙ ОТВЕТ ──────────────────────────── -->
+  <!-- ── SPRÁVNA ODPOVEĎ ──────────────────────────── -->
   <div id="screen-success" class="screen">
     <div class="success-icon-wrap">
       <svg width="32" height="32" viewBox="0 0 32 32" fill="none"
            style="stroke-dasharray:40; stroke-dashoffset:40;">
         <path d="M6 16l8 8L26 8"
-              stroke="#4ade80" stroke-width="3"
-              stroke-linecap="round" stroke-linejoin="round"/>
+              stroke="#3ee089"
+              stroke-width="3"
+              stroke-linecap="round"
+              stroke-linejoin="round"/>
       </svg>
     </div>
-    <h2 class="success-title">Правильно!</h2>
+
+    <h2 class="success-title">Správne!</h2>
     <p id="success-sub" class="success-sub"></p>
-    <button id="btn-next-riddle" class="btn-primary">Следующая загадка →</button>
+
+    <button id="btn-next-riddle" class="btn-primary">
+      Ďalšia hádanka →
+    </button>
   </div>
 
-  <!-- ── ЭКРАН: ФИНАЛ ─────────────────────────────────── -->
+  <!-- ── FINÁL ─────────────────────────────────── -->
   <div id="screen-final" class="screen">
     <div class="trophy-wrap">
       <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-        <path d="M12 4h12v12a6 6 0 01-12 0V4z" stroke="#f0b429" stroke-width="1.8"/>
-        <path d="M12 9H7a4 4 0 004 4" stroke="#f0b429" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M24 9h5a4 4 0 01-4 4" stroke="#f0b429" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M18 22v8M12 32h12" stroke="#f0b429" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M12 4h12v12a6 6 0 01-12 0V4z" stroke="#66c7ff" stroke-width="1.8"/>
+        <path d="M12 9H7a4 4 0 004 4" stroke="#66c7ff" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M24 9h5a4 4 0 01-4 4" stroke="#66c7ff" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M18 22v8M12 32h12" stroke="#66c7ff" stroke-width="1.8" stroke-linecap="round"/>
       </svg>
     </div>
+
     <p id="final-team-name" class="final-team-name"></p>
-    <h1 class="final-title">Вы нашли клад!</h1>
-    <p class="final-sub">Все загадки решены.<br/>Покажите этот экран организатору.</p>
+
+    <h1 class="final-title">Našli ste poklad!</h1>
+
+    <p class="final-sub">
+      Všetky hádanky sú vyriešené.<br/>
+      Ukážte túto obrazovku organizátorovi.
+    </p>
+
     <div id="final-time" class="final-time">00:00</div>
     <p id="final-time-human" class="final-time-label"></p>
+
     <div class="qr-placeholder">
-      QR‑код<br/>организатора
+      QR kód<br/>organizátora
     </div>
-    <button class="btn-primary" onclick="location.reload()">Начать заново</button>
+
+    <button class="btn-primary" onclick="location.reload()">
+      Začať znova
+    </button>
   </div>
 
 </div>
 
 <script src="data/quests.js"></script>
 <script src="js/app.js"></script>
+
 </body>
 </html>

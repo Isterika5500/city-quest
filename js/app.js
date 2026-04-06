@@ -13,9 +13,9 @@ let state = {
   cooldownInterval: null,
 };
 
-const HINT_DELAY_MS   = 10 * 60 * 1000; // 10 минут
+const HINT_DELAY_MS   = 10 * 60 * 1000;
 const MAX_ATTEMPTS    = 5;
-const COOLDOWN_MS     = 30 * 1000;       // 30 секунд блокировки
+const COOLDOWN_MS     = 30 * 1000;
 
 // ─── UTILS ───────────────────────────────────────────────────
 function $(id) { return document.getElementById(id); }
@@ -35,7 +35,7 @@ function formatTimeHuman(ms) {
   const totalSec = Math.floor(ms / 1000);
   const m = Math.floor(totalSec / 60);
   const s = totalSec % 60;
-  return `${m} мин ${String(s).padStart(2,'0')} сек`;
+  return `${m} min ${String(s).padStart(2,'0')} sek`;
 }
 
 // ─── SAVE / LOAD PROGRESS ────────────────────────────────────
@@ -69,9 +69,8 @@ function showScreen(id) {
 function initStartScreen() {
   const saved = loadProgress();
   if (saved && TEAMS[saved.teamId]) {
-    // восстановить прогресс
     const resume = confirm(
-      `Продолжить за ${TEAMS[saved.teamId].name}? (загадка ${saved.currentIndex + 1})`
+      `Pokračovať za ${TEAMS[saved.teamId].name}? (hádanka ${saved.currentIndex + 1})`
     );
     if (resume) {
       state.teamId      = saved.teamId;
@@ -137,13 +136,9 @@ function renderRiddle() {
   const total  = state.riddles.length;
   const idx    = state.currentIndex;
 
-  // Badge
-  $('level-badge-text').textContent = `Загадка ${idx + 1} из ${total}`;
-
-  // Progress bar
+  $('level-badge-text').textContent = `Hádanka ${idx + 1} z ${total}`;
   $('progress-fill').style.width = `${(idx / total) * 100}%`;
 
-  // Image
   const img = $('riddle-img');
   if (riddle.image) {
     img.src = riddle.image;
@@ -154,20 +149,16 @@ function renderRiddle() {
     $('riddle-img-placeholder').style.display = 'flex';
   }
 
-  // Question
   $('riddle-question').textContent = riddle.question;
 
-  // Input
   $('answer-input').value = '';
   $('answer-input').classList.remove('shake');
 
-  // Reset UI
   $('feedback-error').classList.remove('error');
   $('hint-card').classList.remove('visible');
   $('btn-hint').classList.remove('visible');
   $('attempts-warning').classList.remove('visible');
 
-  // Dots
   renderDots();
 }
 
@@ -183,7 +174,7 @@ function renderDots() {
   });
 }
 
-// ─── LIVE TIMER ───────────────────────────────────────────────
+// ─── TIMER ───────────────────────────────────────────────
 let liveTimerInterval = null;
 function startLiveTimer() {
   if (liveTimerInterval) clearInterval(liveTimerInterval);
@@ -226,23 +217,29 @@ function checkAnswer() {
 function onCorrectAnswer() {
   stopHintTimer();
   if (liveTimerInterval) clearInterval(liveTimerInterval);
+
   $('answer-input').value = '';
   $('feedback-error').classList.remove('error');
 
-  // Успешный экран
   showScreen('screen-success');
+
   const isLast = state.currentIndex === state.riddles.length - 1;
+
   $('success-sub').textContent = isLast
-    ? 'Последняя загадка решена! Отличная работа команды.'
-    : 'Вы нашли нужное место. Отправляйтесь к следующей точке.';
-  $('btn-next-riddle').textContent = isLast ? 'Посмотреть результат' : 'Следующая загадка →';
+    ? 'Posledná hádanka vyriešená! Skvelá práca tímu.'
+    : 'Našli ste správne miesto. Pokračujte na ďalší bod.';
+
+  $('btn-next-riddle').textContent = isLast
+    ? 'Zobraziť výsledok'
+    : 'Ďalšia hádanka →';
+
   $('btn-next-riddle').onclick = isLast ? showFinal : goNextRiddle;
 }
 
 function onWrongAnswer(input) {
   state.attempts++;
   input.classList.remove('shake');
-  void input.offsetWidth; // reflow для перезапуска анимации
+  void input.offsetWidth;
   input.classList.add('shake');
   $('feedback-error').classList.add('error');
 
@@ -251,7 +248,7 @@ function onWrongAnswer(input) {
   } else {
     const left = MAX_ATTEMPTS - state.attempts;
     if (left <= 2) {
-      $('attempts-warning').textContent = `Осталось попыток: ${left}`;
+      $('attempts-warning').textContent = `Zostáva pokusov: ${left}`;
       $('attempts-warning').classList.add('visible');
     }
   }
@@ -261,6 +258,7 @@ function onWrongAnswer(input) {
 function startCooldown() {
   const overlay = $('cooldown-overlay');
   overlay.classList.add('visible');
+
   $('answer-input').disabled = true;
   $('btn-check').disabled    = true;
 
@@ -270,12 +268,15 @@ function startCooldown() {
   state.cooldownInterval = setInterval(() => {
     remaining--;
     $('cooldown-timer-text').textContent = remaining;
+
     if (remaining <= 0) {
       clearInterval(state.cooldownInterval);
       overlay.classList.remove('visible');
+
       $('answer-input').disabled = false;
       $('btn-check').disabled    = false;
       $('answer-input').value    = '';
+
       state.attempts = 0;
       $('attempts-warning').classList.remove('visible');
     }
@@ -301,10 +302,13 @@ function goNextRiddle() {
 function showFinal() {
   clearProgress();
   const totalTime = Date.now() - state.startTime;
+
   $('final-team-name').textContent = state.teamName;
   $('final-time').textContent = formatTime(totalTime);
   $('final-time-human').textContent = formatTimeHuman(totalTime);
+
   showScreen('screen-final');
+
   if (liveTimerInterval) clearInterval(liveTimerInterval);
 }
 
