@@ -5,78 +5,59 @@ const TEAMS = {
       {
         id: 1,
         image: "images/place1.jpg",
-        question: "Som barokový pamätník na Mierovom námestí,\npostavili ma ako vďaku za koniec moru.\nTrojica svätých ma zdobí zhora nadol —\nahádni moje meno a príď sa ku mne skloniť.",
-        answer: "morový stĺp",
-        hint: "Stojím uprostred Mierového námestia. Som vysoký kamenný stĺp s postavami svätých.",
+        question: "Som pamätník so symbolikou Svätej Trojice, som jeden z najznámejších barokových pamätníkov v Trenčíne. Ako sa volám? Príď ku mne, aby si začal hľadanie pokladu.",
+        answer: "Mórový stĺp",
+        hint: "Nachádza sa na Mierovom námestí.",
       },
       {
         id: 2,
         image: "images/place2.jpg",
-        question: "Šesť poschodí, gotické začiatky zo 15. storočia,\nneskôr renesančná tvár — mením sa s dobou.\nSpájam dve námestia ako brána do starého mesta,\nz môjho vrcholu vidno hrad aj celé centrum.",
-        answer: "mestská veža",
-        hint: "Stojím na hranici Mierového a Štúrovho námestia. Volajú ma aj Dolná brána.",
-      },
-      {
-        id: 3,
-        image: "images/place3.jpg",
-        question: "Nie som človek, nie som zviera —\nz fontány na námestí na vás pozerám.\nZelený plášť, voda okolo mňa,\nŠtúrovo námestie je môj domov.",
-        answer: "vodník",
-        hint: "Hľadaj fontánu so sochou na Štúrovom námestí.",
-      },
-      {
-        id: 4,
-        image: "images/place4.jpg",
-        question: "Moja kupola nie je skutočná — je to len ilúzia,\nmajster maliar ma oklamal pred stáročiami.\nJezuiti ma začali stavať v roku 1653,\ndnes som pýchou západnej strany Mierového námestia.",
-        answer: "piaristický kostol",
-        hint: "Veľký kostol na konci Mierového námestia, známy falošnou namaľovanou kupolou.",
-      },
-      {
-        id: 5,
-        image: "images/place5.jpg",
-        question: "Vypínam sa nad celým mestom ako kamenný strážca,\npamätám si kráľov aj bojovníkov od 11. storočia.\nPatrónom Považia ma volajú — spolu s hradmi\nSpišským a Devínom som najrozsiahlejší v Európe.\nPríď ku mojej bráne — tu končí vaša cesta!",
-        answer: "trenčiansky hrad",
-        hint: "Vidno ho z celého mesta. Stojí na skale nad Mierovým námestím.",
-      },
+        question: "To, čo je napísané nie vo vašom jazyku, sa dá aj tak prečítať. Nehľadaj význam, ale tvar. Tam, kde písali starí, sú čísla ukryté v písmenách. Spočítaj ich na troch stranách pamätníka.",
+        answer: ["1712", "1712", "4665"],
+        placeholders: ["1. strana", "2. strana", "3. strana"],
+        hint: "Pozri sa na tri strany pamätníka a hľadaj rímske číslice ukryté v písmenách.",
+        hintDelayMs: 15 * 60 * 1000,
+      }
+    
     ],
   },
+
   team2: {
     name: "Tím B",
     riddles: [
       {
         id: 1,
-        image: "images/place5.jpg",
-        question: "Vypínam sa nad celým mestom ako kamenný strážca,\npamätám si kráľov aj bojovníkov od 11. storočia.\nPatrónom Považia ma volajú — spolu s hradmi\nSpišským a Devínom som najrozsiahlejší v Európe.\nPríď ku mojej bráne — tu začína vaša cesta!",
-        answer: "trenčiansky hrad",
-        hint: "Vidno ho z celého mesta. Stojí na skale nad Mierovým námestím.",
-      },
-      {
-        id: 2,
-        image: "images/place4.jpg",
-        question: "Moja kupola nie je skutočná — je to len ilúzia,\nmajster maliar ma oklamal pred stáročiami.\nJezuiti ma začali stavať v roku 1653,\ndnes som pýchou západnej strany Mierového námestia.",
-        answer: "piaristický kostol",
-        hint: "Veľký kostol na konci Mierového námestia, známy falošnou namaľovanou kupolou.",
-      },
-      {
-        id: 3,
-        image: "images/place3.jpg",
-        question: "Nie som človek, nie som zviera —\nz fontány na námestí na vás pozerám.\nZelený plášť, voda okolo mňa,\nŠtúrovo námestie je môj domov.",
-        answer: "vodník",
-        hint: "Hľadaj fontánu so sochou na Štúrovom námestí.",
-      },
-      {
-        id: 4,
-        image: "images/place2.jpg",
-        question: "Šesť poschodí, gotické začiatky zo 15. storočia,\nneskôr renesančná tvár — mením sa s dobou.\nSpájam dve námestia ako brána do starého mesta,\nz môjho vrcholu vidno hrad aj celé centrum.",
-        answer: "mestská veža",
-        hint: "Stojím na hranici Mierového a Štúrovho námestia. Volajú ma aj Dolná brána.",
-      },
-      {
-        id: 5,
-        image: "images/place1.jpg",
-        question: "Som barokový pamätník na Mierovom námestí,\npostavili ma ako vďaku za koniec moru.\nTrojica svätých ma zdobí zhora nadol —\nahádni moje meno a príď sa ku mne skloniť.",
-        answer: "morový stĺp",
-        hint: "Stojím uprostred Mierového námestia. Som vysoký kamenný stĺp s postavami svätých.",
-      },
+        stages: [
+          {
+            image: "images/team2_stage1.jpg",
+            question: `
+              <div class="stage-card">
+                <div class="stage-label">1. etapa</div>
+                <div class="stage-audio-wrap">
+                  <audio controls preload="none" style="width:100%; margin:0 0 16px 0;">
+                    <source src="audio/team2_first_task.mp3" type="audio/mpeg">
+                    Tvoj prehliadač nepodporuje prehrávanie audia.
+                  </audio>
+                </div>
+                <p>Nasleduj znamenie a prejdi 100 krokov tam, kam ukazuje šípka.<br>Tam, kde voda mlčí, nájdeš ho.</p>
+              </div>
+            `,
+          },
+          {
+            image: "images/team2_stage2.jpg",
+            question: `
+              <div class="stage-card">
+                <div class="stage-label">2. etapa</div>
+                <p>Koľkými prstami sa drží okraja?<br>Čo skrýva na hlave?<br>Je jeho druhá ruka prázdna, alebo niečo drží?</p>
+              </div>
+            `,
+            answer: "510",
+            placeholders: ["Zadaj kód"],
+          }
+        ],
+        hint: "Keď spojíš odpovede, vznikne kód. Ten odomkne ďalšiu časť cesty… ale len ak si sa pozeral naozaj pozorne.",
+        hintDelayMs: 15 * 60 * 1000,
+      }
     ],
   },
 };

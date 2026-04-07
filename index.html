@@ -72,17 +72,8 @@
       </div>
 
       <!-- Odpoveď -->
-      <div class="answer-row">
-        <input
-          id="answer-input"
-          class="answer-input"
-          type="text"
-          placeholder="Zadaj odpoveď..."
-          autocomplete="off"
-          autocorrect="off"
-          autocapitalize="off"
-          spellcheck="false"
-        />
+      <div id="answer-row" class="answer-row">
+        <div id="answer-fields" class="answer-fields"></div>
         <button id="btn-check" class="btn-check">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M4 10h12M11 5l5 5-5 5"
@@ -93,6 +84,9 @@
           </svg>
         </button>
       </div>
+
+
+      <button id="btn-stage-next" class="btn-primary" style="display:none; margin-top:16px;">Pokračovať na 2. etapu</button>
 
       <button id="btn-hint" class="btn-hint">
         💡 Zobraziť nápovedu

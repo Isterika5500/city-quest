@@ -4,6 +4,7 @@ let state = {
   teamName: null,
   riddles: [],
   currentIndex: 0,
+  stageIndex: 0,
   startTime: null,
   riddleStartTime: null,
   hintShown: false,
@@ -13,7 +14,7 @@ let state = {
   cooldownInterval: null,
 };
 
-const HINT_DELAY_MS = 10 * 60 * 1000;
+const DEFAULT_HINT_DELAY_MS = 10 * 60 * 1000;
 const MAX_ATTEMPTS  = 5;
 const COOLDOWN_MS   = 30 * 1000;
 
@@ -21,9 +22,9 @@ const COOLDOWN_MS   = 30 * 1000;
 function $(id) { return document.getElementById(id); }
 
 function normalizeAnswer(str) {
-  return str.trim().toLowerCase()
+  return String(str).trim().toLowerCase()
     .replace(/\s+/g, '')
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    .normalize('NFD').replace(/[̀-ͯ]/g, '');
 }
 
 function formatTime(ms) {
@@ -40,6 +41,48 @@ function formatTimeHuman(ms) {
   return `${m} min ${String(s).padStart(2,'0')} sek`;
 }
 
+function getCurrentRiddle() {
+  return state.riddles[state.currentIndex];
+}
+
+function getCurrentStage() {
+  const riddle = getCurrentRiddle();
+  return Array.isArray(riddle.stages) ? riddle.stages[state.stageIndex] : null;
+}
+
+function getAnswerInputs() {
+  return Array.from(document.querySelectorAll('.answer-input'));
+}
+
+function getActiveAnswerData(riddle = getCurrentRiddle()) {
+  const stage = getCurrentStage();
+  if (stage && Object.prototype.hasOwnProperty.call(stage, 'answer')) {
+    return {
+      answer: stage.answer,
+      placeholders: Array.isArray(stage.placeholders) ? stage.placeholders : [],
+    };
+  }
+
+  return {
+    answer: riddle.answer,
+    placeholders: Array.isArray(riddle.placeholders) ? riddle.placeholders : [],
+  };
+}
+
+function isMultiAnswerRiddle(riddle = getCurrentRiddle()) {
+  const active = getActiveAnswerData(riddle).answer;
+  return Array.isArray(active);
+}
+
+function hasAnswerStage(riddle = getCurrentRiddle()) {
+  const active = getActiveAnswerData(riddle).answer;
+  return active !== undefined && active !== null;
+}
+
+function getHintDelayMs(riddle) {
+  return riddle.hintDelayMs || DEFAULT_HINT_DELAY_MS;
+}
+
 // ─── VIBRATION ───────────────────────────────────────────────
 function vibrate(pattern) {
   if (navigator.vibrate) navigator.vibrate(pattern);
@@ -50,6 +93,7 @@ function saveProgress() {
   const data = {
     teamId: state.teamId,
     currentIndex: state.currentIndex,
+    stageIndex: state.stageIndex,
     startTime: state.startTime,
   };
   localStorage.setItem('cq_progress', JSON.stringify(data));
@@ -85,8 +129,9 @@ function initStartScreen() {
       state.teamName     = TEAMS[saved.teamId].name;
       state.riddles      = TEAMS[saved.teamId].riddles;
       state.currentIndex = saved.currentIndex;
+      state.stageIndex   = saved.stageIndex || 0;
       state.startTime    = saved.startTime;
-      startRiddle();
+      startRiddle(true);
       return;
     } else {
       clearProgress();
@@ -122,6 +167,7 @@ $('btn-start').addEventListener('click', () => {
   state.teamName     = TEAMS[state.teamId].name;
   state.riddles      = TEAMS[state.teamId].riddles;
   state.currentIndex = 0;
+  state.stageIndex   = 0;
   state.startTime    = Date.now();
   saveProgress();
   vibrate(50);
@@ -129,7 +175,8 @@ $('btn-start').addEventListener('click', () => {
 });
 
 // ─── RIDDLE SCREEN ────────────────────────────────────────────
-function startRiddle() {
+function startRiddle(isResume = false) {
+  if (!isResume) state.stageIndex = 0;
   state.riddleStartTime = Date.now();
   state.hintShown  = false;
   state.attempts   = 0;
@@ -141,17 +188,54 @@ function startRiddle() {
   startLiveTimer();
 }
 
+function renderAnswerFields(riddle) {
+  const wrap = $('answer-fields');
+  wrap.innerHTML = '';
+  wrap.className = 'answer-fields';
+
+  const active = getActiveAnswerData(riddle);
+  const answers = Array.isArray(active.answer) ? active.answer : [active.answer];
+  const placeholders = active.placeholders;
+
+  if (!hasAnswerStage(riddle)) return;
+
+  if (answers.length > 1) {
+    wrap.classList.add('multi');
+  }
+
+  answers.forEach((_, index) => {
+    const input = document.createElement('input');
+    input.className = 'answer-input';
+    input.type = 'text';
+    input.placeholder = placeholders[index] || `Odpoveď ${index + 1}`;
+    input.autocomplete = 'off';
+    input.autocorrect = 'off';
+    input.autocapitalize = 'off';
+    input.spellcheck = false;
+    input.dataset.index = String(index);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') checkAnswer();
+    });
+    wrap.appendChild(input);
+  });
+
+  const firstInput = getAnswerInputs()[0];
+  if (firstInput) firstInput.focus();
+}
+
 function renderRiddle() {
-  const riddle = state.riddles[state.currentIndex];
+  const riddle = getCurrentRiddle();
+  const stage = getCurrentStage();
   const total  = state.riddles.length;
   const idx    = state.currentIndex;
+  const view = stage || riddle;
 
   $('level-badge-text').textContent = `Hádanka ${idx + 1} z ${total}`;
   $('progress-fill').style.width = `${(idx / total) * 100}%`;
 
   const img = $('riddle-img');
-  if (riddle.image) {
-    img.src = riddle.image;
+  if (view.image) {
+    img.src = view.image;
     img.style.display = 'block';
     $('riddle-img-placeholder').style.display = 'none';
   } else {
@@ -159,11 +243,17 @@ function renderRiddle() {
     $('riddle-img-placeholder').style.display = 'flex';
   }
 
-  // render question with line breaks
-  $('riddle-question').innerHTML = riddle.question.replace(/\n/g, '<br>');
+  $('riddle-question').innerHTML = (view.question || '').replace(/\n/g, '<br>');
 
-  $('answer-input').value = '';
-  $('answer-input').classList.remove('shake');
+  renderAnswerFields(riddle);
+
+  const answerRow = $('answer-row');
+  const stageNextBtn = $('btn-stage-next');
+  const needsAnswer = hasAnswerStage(riddle);
+  const hasMoreStages = Array.isArray(riddle.stages) && state.stageIndex < riddle.stages.length - 1;
+
+  answerRow.style.display = needsAnswer ? 'flex' : 'none';
+  stageNextBtn.style.display = (!needsAnswer && hasMoreStages) ? 'block' : 'none';
 
   $('feedback-error').classList.remove('error');
   $('hint-card').classList.remove('visible');
@@ -200,28 +290,46 @@ function updateLiveTimer() {
 // ─── HINT TIMER ──────────────────────────────────────────────
 function startHintTimer() {
   stopHintTimer();
+  const riddle = getCurrentRiddle();
   state.hintTimerInterval = setTimeout(() => {
     if (!state.hintShown) {
       $('btn-hint').classList.add('visible');
     }
-  }, HINT_DELAY_MS);
+  }, getHintDelayMs(riddle));
 }
 function stopHintTimer() {
   if (state.hintTimerInterval) clearTimeout(state.hintTimerInterval);
 }
 
+// ─── STAGES ──────────────────────────────────────────────────
+function goNextStage() {
+  const riddle = getCurrentRiddle();
+  if (!Array.isArray(riddle.stages)) return;
+  if (state.stageIndex >= riddle.stages.length - 1) return;
+
+  state.stageIndex++;
+  saveProgress();
+  vibrate(35);
+  renderRiddle();
+}
+
 // ─── ANSWER CHECK ─────────────────────────────────────────────
 function checkAnswer() {
-  const input  = $('answer-input');
-  const val    = input.value;
-  const riddle = state.riddles[state.currentIndex];
+  const riddle = getCurrentRiddle();
+  const active = getActiveAnswerData(riddle);
+  const inputs = getAnswerInputs();
+  const values = inputs.map(input => input.value);
 
-  if (!val.trim()) return;
+  if (values.every(val => !val.trim())) return;
 
-  if (normalizeAnswer(val) === normalizeAnswer(riddle.answer)) {
+  const isCorrect = Array.isArray(active.answer)
+    ? values.length === active.answer.length && values.every((val, index) => normalizeAnswer(val) === normalizeAnswer(active.answer[index]))
+    : normalizeAnswer(values[0] || '') === normalizeAnswer(active.answer);
+
+  if (isCorrect) {
     onCorrectAnswer();
   } else {
-    onWrongAnswer(input);
+    onWrongAnswer(inputs);
   }
 }
 
@@ -231,7 +339,10 @@ function onCorrectAnswer() {
 
   vibrate([50, 30, 100]);
 
-  $('answer-input').value = '';
+  getAnswerInputs().forEach(input => {
+    input.value = '';
+    input.classList.remove('shake');
+  });
   $('feedback-error').classList.remove('error');
 
   showScreen('screen-success');
@@ -249,13 +360,15 @@ function onCorrectAnswer() {
   $('btn-next-riddle').onclick = isLast ? showFinal : goNextRiddle;
 }
 
-function onWrongAnswer(input) {
+function onWrongAnswer(inputs) {
   state.attempts++;
   vibrate([80, 20, 80]);
 
-  input.classList.remove('shake');
-  void input.offsetWidth;
-  input.classList.add('shake');
+  inputs.forEach(input => {
+    input.classList.remove('shake');
+    void input.offsetWidth;
+    input.classList.add('shake');
+  });
   $('feedback-error').classList.add('error');
 
   if (state.attempts >= MAX_ATTEMPTS) {
@@ -274,8 +387,11 @@ function startCooldown() {
   const overlay = $('cooldown-overlay');
   overlay.classList.add('visible');
 
-  $('answer-input').disabled = true;
-  $('btn-check').disabled    = true;
+  getAnswerInputs().forEach(input => {
+    input.disabled = true;
+    input.value = '';
+  });
+  $('btn-check').disabled = true;
 
   let remaining = Math.floor(COOLDOWN_MS / 1000);
   $('cooldown-timer-text').textContent = remaining;
@@ -288,9 +404,11 @@ function startCooldown() {
       clearInterval(state.cooldownInterval);
       overlay.classList.remove('visible');
 
-      $('answer-input').disabled = false;
-      $('btn-check').disabled    = false;
-      $('answer-input').value    = '';
+      getAnswerInputs().forEach(input => {
+        input.disabled = false;
+        input.value = '';
+      });
+      $('btn-check').disabled = false;
 
       state.attempts = 0;
       $('attempts-warning').classList.remove('visible');
@@ -300,7 +418,7 @@ function startCooldown() {
 
 // ─── HINT ────────────────────────────────────────────────────
 $('btn-hint').addEventListener('click', () => {
-  const riddle = state.riddles[state.currentIndex];
+  const riddle = getCurrentRiddle();
   $('hint-text').textContent = riddle.hint;
   $('hint-card').classList.add('visible');
   $('btn-hint').classList.remove('visible');
@@ -311,6 +429,7 @@ $('btn-hint').addEventListener('click', () => {
 // ─── NAVIGATION ───────────────────────────────────────────────
 function goNextRiddle() {
   state.currentIndex++;
+  state.stageIndex = 0;
   saveProgress();
   startRiddle();
 }
@@ -330,12 +449,8 @@ function showFinal() {
 }
 
 $('btn-next-riddle').addEventListener('click', () => {});
-
-// ─── ENTER KEY ────────────────────────────────────────────────
-$('answer-input').addEventListener('keydown', e => {
-  if (e.key === 'Enter') checkAnswer();
-});
 $('btn-check').addEventListener('click', checkAnswer);
+$('btn-stage-next').addEventListener('click', goNextStage);
 
 // ─── INIT ─────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', initStartScreen);

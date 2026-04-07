@@ -399,10 +399,26 @@ body::before {
   line-height: 1.55;
 }
 
-.answer-row { display: flex; gap: 10px; }
+.answer-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.answer-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.answer-fields.multi {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 
 .answer-input {
-  flex: 1;
+  width: 100%;
   background: rgba(14, 22, 38, 0.85);
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
@@ -674,3 +690,15 @@ body::before {
   letter-spacing: -0.02em;
 }
 .cooldown-sub { font-size: 13px; color: var(--text2); }
+
+
+@media (max-width: 420px) {
+  .answer-fields.multi {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+.stage-card { display:flex; flex-direction:column; gap:14px; }
+.stage-label { display:inline-flex; width:fit-content; padding:8px 12px; border-radius:999px; background:rgba(77,184,255,0.12); border:1px solid rgba(77,184,255,0.22); color:var(--accent); font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; }
+.stage-audio-wrap audio { border-radius:14px; }
