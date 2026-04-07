@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <meta name="theme-color" content="#0b1220" />
-  <title>City Quest</title>
+  <meta name="theme-color" content="#080e1a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>City Quest — Trenčín</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -13,11 +15,12 @@
 
   <!-- ── ŠTART ─────────────────────────────────── -->
   <div id="screen-start" class="screen">
-    <div class="start-logo">City Quest</div>
-    <h1 class="start-title">Mestská<br/>hra</h1>
+    <div class="start-city-label">Trenčín</div>
+    <div class="start-logo">City<span>Quest</span></div>
+    <div class="start-divider"></div>
     <p class="start-subtitle">
-      Rieš hádanky, nájdi miesta,<br/>
-      dostaň sa do cieľa ako prvý
+      Rieš hádanky, nájdi historické miesta<br/>
+      a dostaň sa do cieľa ako prvý
     </p>
 
     <p class="team-select-label">Vyber tím</p>
@@ -40,7 +43,7 @@
       <div class="riddle-header">
         <div class="level-badge">
           <div class="level-badge-dot"></div>
-          <span id="level-badge-text">Hádanka 1 z 7</span>
+          <span id="level-badge-text">Hádanka 1 z 5</span>
         </div>
         <div id="timer-badge" class="timer-badge">00:00</div>
       </div>
@@ -64,7 +67,7 @@
 
       <!-- Nápoveda -->
       <div id="hint-card" class="hint-card">
-        <div class="hint-card-label">Nápoveda</div>
+        <div class="hint-card-label">💡 Nápoveda</div>
         <p id="hint-text" class="hint-card-text"></p>
       </div>
 
@@ -83,8 +86,8 @@
         <button id="btn-check" class="btn-check">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
             <path d="M4 10h12M11 5l5 5-5 5"
-              stroke="#08111f"
-              stroke-width="2"
+              stroke="#050e1e"
+              stroke-width="2.2"
               stroke-linecap="round"
               stroke-linejoin="round"/>
           </svg>
@@ -92,7 +95,7 @@
       </div>
 
       <button id="btn-hint" class="btn-hint">
-        Zobraziť nápovedu
+        💡 Zobraziť nápovedu
       </button>
 
       <div id="dots-row" class="dots-row"></div>
@@ -102,7 +105,7 @@
     <div id="cooldown-overlay">
       <p class="cooldown-title">Príliš veľa pokusov</p>
       <div id="cooldown-timer-text" class="cooldown-timer">30</div>
-      <p class="cooldown-sub">Sekundy do odblokovania</p>
+      <p class="cooldown-sub">sekúnd do odblokovania</p>
     </div>
   </div>
 
@@ -112,7 +115,7 @@
       <svg width="32" height="32" viewBox="0 0 32 32" fill="none"
            style="stroke-dasharray:40; stroke-dashoffset:40;">
         <path d="M6 16l8 8L26 8"
-              stroke="#3ee089"
+              stroke="#3ee08a"
               stroke-width="3"
               stroke-linecap="round"
               stroke-linejoin="round"/>
@@ -130,16 +133,15 @@
   <!-- ── FINÁL ─────────────────────────────────── -->
   <div id="screen-final" class="screen">
     <div class="trophy-wrap">
-      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-        <path d="M12 4h12v12a6 6 0 01-12 0V4z" stroke="#66c7ff" stroke-width="1.8"/>
-        <path d="M12 9H7a4 4 0 004 4" stroke="#66c7ff" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M24 9h5a4 4 0 01-4 4" stroke="#66c7ff" stroke-width="1.8" stroke-linecap="round"/>
-        <path d="M18 22v8M12 32h12" stroke="#66c7ff" stroke-width="1.8" stroke-linecap="round"/>
+      <svg width="38" height="38" viewBox="0 0 36 36" fill="none">
+        <path d="M12 4h12v12a6 6 0 01-12 0V4z" stroke="#f0c060" stroke-width="1.8"/>
+        <path d="M12 9H7a4 4 0 004 4" stroke="#f0c060" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M24 9h5a4 4 0 01-4 4" stroke="#f0c060" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M18 22v8M12 32h12" stroke="#f0c060" stroke-width="1.8" stroke-linecap="round"/>
       </svg>
     </div>
 
     <p id="final-team-name" class="final-team-name"></p>
-
     <h1 class="final-title">Našli ste poklad!</h1>
 
     <p class="final-sub">

@@ -13,15 +13,17 @@ let state = {
   cooldownInterval: null,
 };
 
-const HINT_DELAY_MS   = 10 * 60 * 1000;
-const MAX_ATTEMPTS    = 5;
-const COOLDOWN_MS     = 30 * 1000;
+const HINT_DELAY_MS = 10 * 60 * 1000;
+const MAX_ATTEMPTS  = 5;
+const COOLDOWN_MS   = 30 * 1000;
 
 // ─── UTILS ───────────────────────────────────────────────────
 function $(id) { return document.getElementById(id); }
 
 function normalizeAnswer(str) {
-  return str.trim().toLowerCase().replace(/\s+/g, '');
+  return str.trim().toLowerCase()
+    .replace(/\s+/g, '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
 function formatTime(ms) {
@@ -36,6 +38,11 @@ function formatTimeHuman(ms) {
   const m = Math.floor(totalSec / 60);
   const s = totalSec % 60;
   return `${m} min ${String(s).padStart(2,'0')} sek`;
+}
+
+// ─── VIBRATION ───────────────────────────────────────────────
+function vibrate(pattern) {
+  if (navigator.vibrate) navigator.vibrate(pattern);
 }
 
 // ─── SAVE / LOAD PROGRESS ────────────────────────────────────
@@ -63,6 +70,7 @@ function clearProgress() {
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   $(id).classList.add('active');
+  window.scrollTo(0, 0);
 }
 
 // ─── START SCREEN ────────────────────────────────────────────
@@ -73,11 +81,11 @@ function initStartScreen() {
       `Pokračovať za ${TEAMS[saved.teamId].name}? (hádanka ${saved.currentIndex + 1})`
     );
     if (resume) {
-      state.teamId      = saved.teamId;
-      state.teamName    = TEAMS[saved.teamId].name;
-      state.riddles     = TEAMS[saved.teamId].riddles;
+      state.teamId       = saved.teamId;
+      state.teamName     = TEAMS[saved.teamId].name;
+      state.riddles      = TEAMS[saved.teamId].riddles;
       state.currentIndex = saved.currentIndex;
-      state.startTime   = saved.startTime;
+      state.startTime    = saved.startTime;
       startRiddle();
       return;
     } else {
@@ -103,6 +111,7 @@ function renderTeamButtons() {
       btn.classList.add('selected');
       $('btn-start').disabled = false;
       state.teamId = id;
+      vibrate(30);
     });
     grid.appendChild(btn);
   });
@@ -110,11 +119,12 @@ function renderTeamButtons() {
 
 $('btn-start').addEventListener('click', () => {
   if (!state.teamId) return;
-  state.teamName  = TEAMS[state.teamId].name;
-  state.riddles   = TEAMS[state.teamId].riddles;
+  state.teamName     = TEAMS[state.teamId].name;
+  state.riddles      = TEAMS[state.teamId].riddles;
   state.currentIndex = 0;
-  state.startTime = Date.now();
+  state.startTime    = Date.now();
   saveProgress();
+  vibrate(50);
   startRiddle();
 });
 
@@ -149,7 +159,8 @@ function renderRiddle() {
     $('riddle-img-placeholder').style.display = 'flex';
   }
 
-  $('riddle-question').textContent = riddle.question;
+  // render question with line breaks
+  $('riddle-question').innerHTML = riddle.question.replace(/\n/g, '<br>');
 
   $('answer-input').value = '';
   $('answer-input').classList.remove('shake');
@@ -174,7 +185,7 @@ function renderDots() {
   });
 }
 
-// ─── TIMER ───────────────────────────────────────────────
+// ─── TIMER ───────────────────────────────────────────────────
 let liveTimerInterval = null;
 function startLiveTimer() {
   if (liveTimerInterval) clearInterval(liveTimerInterval);
@@ -186,7 +197,7 @@ function updateLiveTimer() {
   $('timer-badge').textContent = formatTime(elapsed);
 }
 
-// ─── HINT TIMER ───────────────────────────────────────────────
+// ─── HINT TIMER ──────────────────────────────────────────────
 function startHintTimer() {
   stopHintTimer();
   state.hintTimerInterval = setTimeout(() => {
@@ -201,9 +212,9 @@ function stopHintTimer() {
 
 // ─── ANSWER CHECK ─────────────────────────────────────────────
 function checkAnswer() {
-  const input   = $('answer-input');
-  const val     = input.value;
-  const riddle  = state.riddles[state.currentIndex];
+  const input  = $('answer-input');
+  const val    = input.value;
+  const riddle = state.riddles[state.currentIndex];
 
   if (!val.trim()) return;
 
@@ -218,6 +229,8 @@ function onCorrectAnswer() {
   stopHintTimer();
   if (liveTimerInterval) clearInterval(liveTimerInterval);
 
+  vibrate([50, 30, 100]);
+
   $('answer-input').value = '';
   $('feedback-error').classList.remove('error');
 
@@ -227,7 +240,7 @@ function onCorrectAnswer() {
 
   $('success-sub').textContent = isLast
     ? 'Posledná hádanka vyriešená! Skvelá práca tímu.'
-    : 'Našli ste správne miesto. Pokračujte na ďalší bod.';
+    : 'Správne miesto! Pokračujte na ďalší bod.';
 
   $('btn-next-riddle').textContent = isLast
     ? 'Zobraziť výsledok'
@@ -238,6 +251,8 @@ function onCorrectAnswer() {
 
 function onWrongAnswer(input) {
   state.attempts++;
+  vibrate([80, 20, 80]);
+
   input.classList.remove('shake');
   void input.offsetWidth;
   input.classList.add('shake');
@@ -290,6 +305,7 @@ $('btn-hint').addEventListener('click', () => {
   $('hint-card').classList.add('visible');
   $('btn-hint').classList.remove('visible');
   state.hintShown = true;
+  vibrate(20);
 });
 
 // ─── NAVIGATION ───────────────────────────────────────────────
@@ -304,10 +320,11 @@ function showFinal() {
   const totalTime = Date.now() - state.startTime;
 
   $('final-team-name').textContent = state.teamName;
-  $('final-time').textContent = formatTime(totalTime);
+  $('final-time').textContent      = formatTime(totalTime);
   $('final-time-human').textContent = formatTimeHuman(totalTime);
 
   showScreen('screen-final');
+  vibrate([100, 50, 100, 50, 200]);
 
   if (liveTimerInterval) clearInterval(liveTimerInterval);
 }
