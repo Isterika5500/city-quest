@@ -1,72 +1,45 @@
-# City Quest 🗺️
+# Trenčín Quest — Mestská šifrovacia hra
 
-Мобильный веб-квест для городских игр. Команды проходят последовательность загадок, привязанных к реальным локациям.
+Webová aplikácia pre mestskú kvest hru v Trenčíne s dvoma tímami.
 
-## Структура проекта
+## Štruktúra projektu
 
 ```
-cityquest/
-├── index.html          # Главная страница
+trencan-quest/
+├── index.html        # Hlavná stránka
 ├── css/
-│   └── style.css       # Все стили
+│   └── style.css     # Štýly (dark medieval téma)
 ├── js/
-│   └── app.js          # Логика игры
-├── data/
-│   └── quests.js       # Загадки и команды
-└── images/             # Фото локаций (добавить самостоятельно)
+│   ├── data.js       # Dáta: zastávky, záhady, trasy
+│   └── app.js        # Herná logika
+└── README.md
 ```
 
-## Как добавить контент
+## Spustenie
 
-Откройте `data/quests.js` и заполните загадки:
+Stačí otvoriť `index.html` v prehliadači — nevyžaduje server ani inštaláciu.
 
-```js
-const TEAMS = {
-  team1: {
-    name: "Команда А",
-    riddles: [
-      {
-        id: 1,
-        image: "images/place1.jpg",   // путь к фото
-        question: "Текст загадки...",  // текст или числа
-        answer: "1234",               // правильный ответ (регистр не важен)
-        hint: "Подсказка...",         // появится через 10 минут
-      },
-      // ... ещё загадки
-    ],
-  },
-  team2: {
-    name: "Команда Б",
-    riddles: [ /* другой маршрут */ ],
-  },
-};
-```
+## Maršruty
 
-## Механика
+| Tím | Poradie |
+|-----|---------|
+| Tím 1 | Hotel Elizabeth → Morový stĺp → Vodník → Synagóga → Hrad |
+| Tím 2 | Synagóga → Vodník → Morový stĺp → Hotel Elizabeth → Hrad |
 
-| Событие | Поведение |
-|---|---|
-| Верный ответ | Экран успеха → следующая загадка |
-| Неверный ответ | Встряска поля, счётчик попыток |
-| 5 неверных подряд | 30-секундная блокировка ввода |
-| После 10 минут | Появляется кнопка «Показать подсказку» |
-| Все загадки решены | Финальный экран с временем команды |
-| Обновление страницы | Прогресс сохраняется (localStorage) |
+## Záhady
 
-## Деплой на GitHub Pages
+| Zastávka | Typ šifry | Odpoveď |
+|----------|-----------|---------|
+| Hotel Elizabeth | Číselný rébus (poradové čísla písmen) | ELIZABETH |
+| Morový stĺp | Akrostich (slovenský text) | MOROVÝ STĹP |
+| Vodník | Morseova abeceda | VODNIK |
+| Synagóga | Cézarov šifr (posun 4) | SINAGOGA |
+| Hrad (finále) | Binárny šifr | HRAD |
 
-1. Создайте репозиторий на GitHub
-2. Загрузите все файлы
-3. Перейдите: `Settings → Pages → Source: main / root`
-4. Сайт будет доступен по адресу: `https://ваш-ник.github.io/название-репо/`
+## Mechanika
 
-Ссылки для команд:
-- `https://.../?team=team1` *(или просто дайте каждой команде выбрать на стартовом экране)*
+Každá zastávka = 2 fázy:
+1. **Záhada** → hráč zadá odpoveď → ak správne, zobrazí sa názov miesta
+2. **Úloha na mieste** → doplnkové otázky → tlačidlo na ďalšiu zastávku
 
-## Настройки в app.js
-
-```js
-const HINT_DELAY_MS = 10 * 60 * 1000;  // когда появляется подсказка (10 мин)
-const MAX_ATTEMPTS  = 5;                // попыток до блокировки
-const COOLDOWN_MS   = 30 * 1000;        // время блокировки (30 сек)
-```
+Odpovede sú **case-insensitive** a ignorujú diakritiku.
