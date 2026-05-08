@@ -6,13 +6,13 @@ const STOPS = {
 
   hotel: {
     id: 'hotel',
-    name: 'Hotel Elizabeth',
-    shortName: 'Hotel',
+    name: '? ? ?',           // hidden until solved
+    revealName: 'Hotel Elizabeth',
+    shortName: '1',
     icon: '🏨',
     puzzle: {
-      title: 'Rozlúšti názov miesta',
-      text: `Každé číslo je poradové číslo písmena v anglickej abecede.<br/>
-             Spoj ich dohromady a dostaneš meno, kde ťa čaká ďalšia zastávka.`,
+      title: 'Rozlúšti šifru',
+      text: 'Každé číslo je poradové číslo písmena v anglickej abecede. Spoj ich dohromady.',
       cipher: '5 · 12 · 9 · 26 · 1 · 2 · 5 · 20 · 8',
       hint: 'A=1, B=2, C=3 ... Z=26',
       answer: 'ELIZABETH',
@@ -20,19 +20,22 @@ const STOPS = {
     },
     onsite: {
       title: 'Úloha na mieste',
-      text: 'Si pred hotelom. Pozri sa na hlavný fasád.<br/><strong>Koľko okien má druhé poschodie?</strong>',
-      note: 'Zapíš si číslo — možno sa ti zíde neskôr.'
+      text: 'Si pred budovou. Pozri sa na hlavný fasád.',
+      fields: [
+        { label: 'Koľko okien má druhé poschodie?', placeholder: 'Počet okien...' }
+      ]
     }
   },
 
   stolp: {
     id: 'stolp',
-    name: 'Morový stĺp',
-    shortName: 'Stĺp',
+    name: '? ? ?',
+    revealName: 'Morový stĺp',
+    shortName: '2',
     icon: '⛪',
     puzzle: {
       title: 'Akrostich',
-      text: 'Čítaj <strong>prvé písmená</strong> každého riadku zhora nadol. Dostaneš názov miesta.',
+      text: 'Čítaj <strong>prvé písmená</strong> každého riadku zhora nadol.',
       cipher: `M esto ma pozná už dlho<br/>
 O zdobený som barokovým štýlom<br/>
 R oky chránim ľudí pred nešťastím<br/>
@@ -44,24 +47,26 @@ T y ma musíš nájsť<br/>
 Ľ udia ku mne často chodia<br/>
 P amätáš si moje meno?`,
       hint: 'Prvé písmeno každého riadku...',
+      hint2: 'Rímske číslice na pamätníku: MDCCXII = 1712 &nbsp;·&nbsp; MCDLXV = 1465',
       answer: 'MOROVÝ STĹP',
       answerDisplay: 'MOROVÝ STĹP'
     },
     onsite: {
       title: 'Úloha na mieste',
-      text: 'Nájdi latinské nápisy na troch stranách pamätníka a zapíš čísla:',
-      note: `<span class="onsite-list">
-               <span>🧭 Severná strana: <strong>4665</strong></span>
-               <span>🧭 Južná strana: <strong>1712</strong></span>
-               <span>🧭 Východná strana: <strong>1712</strong></span>
-             </span>`
+      text: 'Nájdi latinské nápisy na troch stranách pamätníka.',
+      fields: [
+        { label: '🧭 Severná strana — aké číslo?', placeholder: 'Číslo...' },
+        { label: '🧭 Južná strana — aké číslo?',   placeholder: 'Číslo...' },
+        { label: '🧭 Východná strana — aké číslo?', placeholder: 'Číslo...' }
+      ]
     }
   },
 
   vodnik: {
     id: 'vodnik',
-    name: 'Vodník',
-    shortName: 'Vodník',
+    name: '? ? ?',
+    revealName: 'Vodník',
+    shortName: '3',
     icon: '🧙',
     puzzle: {
       title: 'Morseova abeceda',
@@ -74,25 +79,25 @@ P amätáš si moje meno?`,
     },
     onsite: {
       title: 'Úloha na mieste',
-      text: 'Pozoruj sochu Vodníka a odpovedz na otázky:',
-      note: `<span class="onsite-list">
-               <span>🖐 Koľkými prstami sa drží okraja studne? → <strong>5</strong></span>
-               <span>🎩 Čo má na hlave? (cylinder = 1) → <strong>1</strong></span>
-               <span>✋ Čo drží v druhej ruke? (nič = 0) → <strong>0</strong></span>
-               <span>🔑 <strong>Kód: 510</strong></span>
-             </span>`
+      text: 'Pozoruj sochu a odpovedz na otázky. Na konci zadaj 3-ciferný kód.',
+      fields: [
+        { label: '🖐 Koľkými prstami sa drží okraja studne?', placeholder: 'Číslo...' },
+        { label: '🎩 Čo má na hlave? (cylinder = 1)',         placeholder: 'Číslo...' },
+        { label: '✋ Čo drží v druhej ruke? (nič = 0)',       placeholder: 'Číslo...' },
+        { label: '🔑 Výsledný 3-ciferný kód',                placeholder: 'Kód...' }
+      ]
     }
   },
 
   synagoga: {
     id: 'synagoga',
-    name: 'Synagóga',
-    shortName: 'Synagóga',
+    name: '? ? ?',
+    revealName: 'Synagóga',
+    shortName: '4',
     icon: '🕍',
     puzzle: {
       title: 'Cézarov šifr',
-      text: `Každé písmeno v zašifrovanom slove posuň späť v abecede.<br/>
-             <strong>Posun = počet písmen v slove ROMA</strong>`,
+      text: 'Každé písmeno v zašifrovanom slove posuň <strong>späť v abecede</strong>.<br/>Posun = počet písmen v slove ROMA.',
       cipher: 'V L Q D J R J D',
       hint: 'ROMA má 4 písmená → posuň každé písmeno o 4 späť',
       answer: 'SINAGOGA',
@@ -100,25 +105,27 @@ P amätáš si moje meno?`,
     },
     onsite: {
       title: 'Úloha na mieste',
-      text: 'Pozri sa na hornú časť budovy.<br/><strong>Aký geometrický tvar tam dominuje?</strong>',
-      note: 'Zapíš si tvar — jedným slovom.'
+      text: 'Pozri sa na budovu a odpovedz.',
+      fields: [
+        { label: 'Aký geometrický tvar dominuje v hornej časti budovy?', placeholder: 'Tvar...' }
+      ]
     }
   },
 
   hrad: {
     id: 'hrad',
-    name: 'Trenčínsky hrad',
-    shortName: 'Hrad',
+    name: '? ? ?',
+    revealName: 'Trenčínsky hrad',
+    shortName: '5',
     icon: '🏰',
     puzzle: {
       title: 'Binárny šifr — FINÁLE',
-      text: `Každá skupina núl a jednotiek predstavuje jedno písmeno.<br/>
-             Použi tabuľku nižšie a rozlúšti slovo.`,
+      text: 'Každá skupina núl a jednotiek = jedno písmeno. Použi tabuľku a rozlúšti slovo.',
       cipher: '01000 &nbsp; 10010 &nbsp; 00001 &nbsp; 00100',
       hint: null,
       binaryTable: true,
       answer: 'HRAD',
-      answerDisplay: 'TRENČÍNSKY HRAD'
+      answerDisplay: 'HRAD'
     },
     onsite: null,
     isFinal: true
@@ -126,24 +133,24 @@ P amätáš si moje meno?`,
 
 };
 
-// Route order per team
 const ROUTES = {
   1: ['hotel', 'stolp', 'vodnik', 'synagoga', 'hrad'],
   2: ['synagoga', 'vodnik', 'stolp', 'hotel', 'hrad']
 };
 
-// Morse reference table
+// Trenčín hrad coords for prize map
+const PRIZE_COORDS = { lat: 48.8944, lng: 18.0440, label: 'Trenčínsky hrad — tu čaká vaša cena!' };
+
 const MORSE_TABLE = [
-  ['A', '·—'],  ['B', '—···'], ['C', '—·—·'], ['D', '—··'],
-  ['E', '·'],   ['F', '··—·'], ['G', '——·'],  ['H', '····'],
-  ['I', '··'],  ['J', '·———'], ['K', '—·—'],  ['L', '·—··'],
-  ['M', '——'],  ['N', '—·'],   ['O', '———'],  ['P', '·——·'],
-  ['Q', '——·—'],['R', '·—·'],  ['S', '···'],  ['T', '—'],
-  ['U', '··—'], ['V', '···—'], ['W', '·——'],  ['X', '—··—'],
-  ['Y', '—·——'],['Z', '——··']
+  ['A','·—'],  ['B','—···'],['C','—·—·'],['D','—··'],
+  ['E','·'],   ['F','··—·'],['G','——·'], ['H','····'],
+  ['I','··'],  ['J','·———'],['K','—·—'], ['L','·—··'],
+  ['M','——'],  ['N','—·'],  ['O','———'], ['P','·——·'],
+  ['Q','——·—'],['R','·—·'], ['S','···'], ['T','—'],
+  ['U','··—'], ['V','···—'],['W','·——'], ['X','—··—'],
+  ['Y','—·——'],['Z','——··']
 ];
 
-// Binary reference table
 const BINARY_TABLE = [
   ['A','00001'],['B','00010'],['C','00011'],['D','00100'],['E','00101'],
   ['F','00110'],['G','00111'],['H','01000'],['I','01001'],['J','01010'],

@@ -406,3 +406,117 @@ body {
   25%      { transform: translateX(-5px); }
   75%      { transform: translateX(5px); }
 }
+
+/* ── Info box (Synagóga cipher) ──────────────────────── */
+
+.info-box {
+  background: var(--blue-50);
+  border: 1.5px solid var(--blue-200);
+  border-radius: var(--r-md);
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+.info-box-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--blue-600);
+  margin-bottom: 0.5rem;
+}
+.cipher-text--dark {
+  font-family: 'SF Mono', 'Courier New', monospace;
+  font-size: 1.1rem;
+  color: var(--blue-900);
+  letter-spacing: 0.2em;
+  font-weight: 700;
+}
+
+/* ── Second hint (roman numerals) ───────────────────── */
+
+.hint-box--roman {
+  margin-top: 0.5rem;
+  background: var(--blue-50);
+  border-left-color: var(--blue-600);
+  color: var(--blue-900);
+  font-weight: 500;
+}
+
+/* ── Onsite input fields ─────────────────────────────── */
+
+.fields-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+.field-group { display: flex; flex-direction: column; gap: 0.3rem; }
+.field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--blue-800);
+  line-height: 1.4;
+}
+.field-input {
+  background: var(--gray-50);
+  border: 1.5px solid var(--gray-200);
+  border-radius: var(--r-sm);
+  color: var(--blue-900);
+  font-size: 0.95rem;
+  padding: 0.65rem 0.875rem;
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+  width: 100%;
+}
+.field-input:focus { border-color: var(--blue-400); background: var(--white); }
+
+/* ── Map screen ──────────────────────────────────────── */
+
+.map-embed-wrap {
+  border-radius: var(--r-md);
+  overflow: hidden;
+  margin: 0.875rem 0 0.5rem;
+  border: 1.5px solid var(--blue-200);
+  height: 240px;
+}
+.map-iframe {
+  width: 100%; height: 100%;
+  border: none; display: block;
+}
+.map-coords {
+  font-size: 0.78rem;
+  color: var(--gray-600);
+  text-align: center;
+  margin-bottom: 0.875rem;
+  font-family: 'SF Mono', monospace;
+}
+.map-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0 1.125rem;
+  margin-bottom: 0.75rem;
+}
+.btn-map {
+  display: block;
+  text-align: center;
+  padding: 0.8rem;
+  border-radius: var(--r-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  background: var(--blue-50);
+  color: var(--blue-800);
+  border: 1.5px solid var(--blue-200);
+  transition: background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-map:active { background: var(--blue-100); }
+.btn-map--waze {
+  background: var(--gray-50);
+  color: var(--gray-600);
+  border-color: var(--gray-200);
+}
+.btn-map--waze:active { background: var(--gray-100); }

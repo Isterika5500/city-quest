@@ -6,13 +6,17 @@ let state = {
   team: null,
   route: [],
   currentStop: 0,
-  phase: 'puzzle'
+  phase: 'puzzle' // 'puzzle' | 'onsite' | 'map'
 };
+
+// ── Screens ───────────────────────────────────────────────────
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
+
+// ── Start ─────────────────────────────────────────────────────
 
 function startGame(team) {
   state.team = team;
@@ -32,7 +36,7 @@ function restartGame() {
   showScreen('screen-intro');
 }
 
-// ── Progress ─────────────────────────────────────────────────
+// ── Progress ──────────────────────────────────────────────────
 
 function buildProgressDots() {
   const container = document.getElementById('progress-stops');
@@ -44,7 +48,7 @@ function buildProgressDots() {
     dot.id = `dot-${i}`;
     dot.innerHTML = `
       <div class="progress-dot-circle">${stop.icon}</div>
-      <span class="progress-dot-label">${stop.shortName || stop.name}</span>`;
+      <span class="progress-dot-label">${stop.shortName}</span>`;
     container.appendChild(dot);
   });
   updateProgress();
@@ -61,11 +65,11 @@ function updateProgress() {
     dot.classList.toggle('active', i === state.currentStop);
   });
 
-  document.getElementById('btn-back').style.visibility =
-    state.currentStop > 0 || state.phase === 'onsite' ? 'visible' : 'hidden';
+  const showBack = state.currentStop > 0 || state.phase === 'onsite' || state.phase === 'map';
+  document.getElementById('btn-back').style.visibility = showBack ? 'visible' : 'hidden';
 }
 
-// ── Render ───────────────────────────────────────────────────
+// ── Render ────────────────────────────────────────────────────
 
 function renderStop() {
   const stopId = state.route[state.currentStop];
@@ -73,19 +77,25 @@ function renderStop() {
   const main = document.getElementById('game-main');
   updateProgress();
 
-  main.innerHTML = state.phase === 'puzzle'
-    ? renderPuzzlePhase(stop)
-    : renderOnsitePhase(stop);
+  let html = '';
+  if (state.phase === 'puzzle')      html = renderPuzzlePhase(stop);
+  else if (state.phase === 'onsite') html = renderOnsitePhase(stop);
+  else if (state.phase === 'map')    html = renderMapPhase();
 
+  main.innerHTML = html;
   main.classList.remove('fade-in');
   void main.offsetWidth;
   main.classList.add('fade-in');
 }
 
+// ── Phase: PUZZLE ─────────────────────────────────────────────
+
 function renderPuzzlePhase(stop) {
   const p = stop.puzzle;
 
   let extras = '';
+
+  // Morse table
   if (p.morseTable) {
     extras += `
       <button class="btn-toggle" onclick="toggleTable('morse-table')">📋 Morseova tabuľka</button>
@@ -99,6 +109,8 @@ function renderPuzzlePhase(stop) {
         </div>
       </div>`;
   }
+
+  // Binary table
   if (p.binaryTable) {
     extras += `
       <button class="btn-toggle" onclick="toggleTable('binary-table')">📋 Binárna tabuľka</button>
@@ -113,7 +125,17 @@ function renderPuzzlePhase(stop) {
       </div>`;
   }
 
-  const hint = p.hint ? `<div class="hint-box">💡 ${p.hint}</div>` : '';
+  const hint  = p.hint  ? `<div class="hint-box">💡 ${p.hint}</div>` : '';
+  const hint2 = p.hint2 ? `<div class="hint-box hint-box--roman">🏛 ${p.hint2}</div>` : '';
+
+  // Synagóga: cipher rendered inside blue info-box instead of dark cipher-box
+  const isSynagoga = stop.id === 'synagoga';
+  const cipherHtml = isSynagoga
+    ? `<div class="info-box">
+         <div class="info-box-label">Zašifrované slovo</div>
+         <div class="cipher-text cipher-text--dark">${p.cipher}</div>
+       </div>`
+    : `<div class="cipher-box"><span class="cipher-text">${p.cipher}</span></div>`;
 
   return `
     <div class="stop-card">
@@ -128,10 +150,9 @@ function renderPuzzlePhase(stop) {
       <div class="puzzle-section">
         <div class="section-label">${p.title}</div>
         <p class="puzzle-text">${p.text}</p>
-        <div class="cipher-box">
-          <span class="cipher-text">${p.cipher}</span>
-        </div>
+        ${cipherHtml}
         ${hint}
+        ${hint2}
         ${extras}
       </div>
 
@@ -154,9 +175,27 @@ function renderPuzzlePhase(stop) {
     </div>`;
 }
 
+// ── Phase: ONSITE ─────────────────────────────────────────────
+
 function renderOnsitePhase(stop) {
   const o = stop.onsite;
-  const btnLabel = stop.isFinal ? '🏆 Zobraziť výsledok' : 'Ďalšia zastávka →';
+  const isLastStop = state.currentStop === state.route.length - 1;
+  // Last stop (hrad) has no onsite, so this only fires for non-final stops
+  const btnLabel = 'Ďalšia zastávka →';
+
+  const fields = (o.fields || []).map((f, i) => `
+    <div class="field-group">
+      <label class="field-label">${f.label}</label>
+      <input
+        type="text"
+        class="field-input"
+        id="field-${i}"
+        placeholder="${f.placeholder}"
+        autocomplete="off"
+        autocorrect="off"
+        spellcheck="false"
+      />
+    </div>`).join('');
 
   return `
     <div class="stop-card">
@@ -164,7 +203,7 @@ function renderOnsitePhase(stop) {
         <div class="stop-icon-wrap">${stop.icon}</div>
         <div>
           <div class="stop-number">Zastávka ${state.currentStop + 1} — na mieste</div>
-          <div class="stop-name">${stop.name}</div>
+          <div class="stop-name">${stop.revealName}</div>
         </div>
       </div>
 
@@ -173,19 +212,69 @@ function renderOnsitePhase(stop) {
       <div class="onsite-section">
         <div class="section-label">${o.title}</div>
         <p class="onsite-text">${o.text}</p>
-        <div class="onsite-note">${o.note}</div>
+        <div class="fields-wrap">${fields}</div>
       </div>
 
       <button class="btn-next" onclick="nextStop()">${btnLabel}</button>
     </div>`;
 }
 
-// ── Logic ────────────────────────────────────────────────────
+// ── Phase: MAP (prize location) ───────────────────────────────
+
+function renderMapPhase() {
+  const c = PRIZE_COORDS;
+  const mapsUrl = `https://www.google.com/maps?q=${c.lat},${c.lng}`;
+  const wazeUrl = `https://waze.com/ul?ll=${c.lat},${c.lng}&navigate=yes`;
+
+  return `
+    <div class="stop-card">
+      <div class="stop-header" style="background: var(--blue-800);">
+        <div class="stop-icon-wrap">🏆</div>
+        <div>
+          <div class="stop-number">Cieľ</div>
+          <div class="stop-name">Idete pre cenu!</div>
+        </div>
+      </div>
+
+      <div class="solved-badge">🎉 Všetky záhady rozlúštené!</div>
+
+      <div class="onsite-section">
+        <div class="section-label">Kde čaká vaša cena</div>
+        <p class="onsite-text">${c.label}</p>
+
+        <div class="map-embed-wrap">
+          <iframe
+            class="map-iframe"
+            src="https://maps.google.com/maps?q=${c.lat},${c.lng}&z=16&output=embed"
+            allowfullscreen
+            loading="lazy"
+          ></iframe>
+        </div>
+
+        <div class="map-coords">
+          <span>📍 ${c.lat}, ${c.lng}</span>
+        </div>
+      </div>
+
+      <div class="map-buttons">
+        <a class="btn-map" href="${mapsUrl}" target="_blank">
+          🗺 Otvoriť v Google Maps
+        </a>
+        <a class="btn-map btn-map--waze" href="${wazeUrl}" target="_blank">
+          🚗 Navigovať vo Waze
+        </a>
+      </div>
+
+      <button class="btn-next" onclick="showFinish()">🏅 Dokončiť hru</button>
+    </div>`;
+}
+
+// ── Answer Check ──────────────────────────────────────────────
 
 function checkAnswer() {
-  const input = document.getElementById('answer-input');
+  const input    = document.getElementById('answer-input');
   const feedback = document.getElementById('answer-feedback');
-  const stop = STOPS[state.route[state.currentStop]];
+  const stop     = STOPS[state.route[state.currentStop]];
 
   const normalize = s => s.trim().toUpperCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -193,7 +282,7 @@ function checkAnswer() {
 
   if (normalize(input.value) === normalize(stop.puzzle.answer)) {
     feedback.className = 'answer-feedback correct';
-    feedback.textContent = `✓ Správne! Choď na: ${stop.puzzle.answerDisplay}`;
+    feedback.textContent = `✓ Správne! Nájdi: ${stop.puzzle.answerDisplay}`;
     feedback.classList.remove('hidden');
     input.disabled = true;
     document.querySelector('.btn-check').disabled = true;
@@ -206,7 +295,11 @@ function checkAnswer() {
           </button>`);
       }, 500);
     } else {
-      setTimeout(showFinish, 1000);
+      // Final stop — go to map screen
+      setTimeout(() => {
+        state.phase = 'map';
+        renderStop();
+      }, 900);
     }
   } else {
     feedback.className = 'answer-feedback wrong';
@@ -228,12 +321,15 @@ function nextStop() {
     state.phase = 'puzzle';
     renderStop();
   } else {
-    showFinish();
+    state.phase = 'map';
+    renderStop();
   }
 }
 
 function goBack() {
-  if (state.phase === 'onsite') {
+  if (state.phase === 'map') {
+    state.phase = 'puzzle';
+  } else if (state.phase === 'onsite') {
     state.phase = 'puzzle';
   } else if (state.currentStop > 0) {
     state.currentStop--;
