@@ -6,7 +6,7 @@ const STOPS = {
 
   hotel: {
     id: 'hotel',
-    name: '? ? ?',           // hidden until solved
+    name: '? ? ?',
     revealName: 'Hotel Elizabeth',
     shortName: '1',
     icon: '🏨',
@@ -20,9 +20,14 @@ const STOPS = {
     },
     onsite: {
       title: 'Úloha na mieste',
-      text: 'Si pred budovou. Pozri sa na hlavný fasád.',
+      text: 'Si pred budovou. Spočítaj vlajky na fasáde hotela.',
       fields: [
-        { label: 'Koľko okien má druhé poschodie?', placeholder: 'Počet okien...' }
+        {
+          label: '🚩 Koľko vlajok je na fasáde hotela?',
+          placeholder: 'Počet vlajok...',
+          answer: '10',           // test value — change to real count
+          required: true
+        }
       ]
     }
   },
@@ -37,27 +42,26 @@ const STOPS = {
       title: 'Akrostich',
       text: 'Čítaj <strong>prvé písmená</strong> každého riadku zhora nadol.',
       cipher: `M esto ma pozná už dlho<br/>
-O zdobený som barokovým štýlom<br/>
-R oky chránim ľudí pred nešťastím<br/>
-O mne hovoria ako o symbole viery<br/>
-V ysoko sa týčim nad námestím<br/>
-Ý znam mám historický<br/>
-S om spojený so Svätou Trojicou<br/>
-T y ma musíš nájsť<br/>
-Ľ udia ku mne často chodia<br/>
-P amätáš si moje meno?`,
+Ozdobený som barokovým štýlom<br/>
+Roky chránim ľudí pred nešťastím<br/>
+Omne hovoria ako o symbole viery<br/>
+Vysoko sa týčim nad námestím<br/>
+Ýznam mám historický<br/>
+Som spojený so Svätou Trojicou<br/>
+Ty ma musíš nájsť<br/>
+Ľudia ku mne často chodia<br/>
+Pamätáš si moje meno?`,
       hint: 'Prvé písmeno každého riadku...',
-      hint2: 'Rímske číslice na pamätníku: MDCCXII = 1712 &nbsp;·&nbsp; MCDLXV = 1465',
       answer: 'MOROVÝ STĹP',
       answerDisplay: 'MOROVÝ STĹP'
     },
     onsite: {
       title: 'Úloha na mieste',
-      text: 'Nájdi latinské nápisy na troch stranách pamätníka.',
+      text: 'Nájdi rímske čísla na troch stranách pamätníka a zadaj čísla.',
       fields: [
-        { label: '🧭 Severná strana — aké číslo?', placeholder: 'Číslo...' },
-        { label: '🧭 Južná strana — aké číslo?',   placeholder: 'Číslo...' },
-        { label: '🧭 Východná strana — aké číslo?', placeholder: 'Číslo...' }
+        { label: '🧭 Severná strana — aké číslo?',  placeholder: 'Číslo...', answer: '4665', required: true },
+        { label: '🧭 Južná strana — aké číslo?',    placeholder: 'Číslo...', answer: '1712', required: false },
+        { label: '🧭 Východná strana — aké číslo?', placeholder: 'Číslo...', answer: '1712', required: false }
       ]
     }
   },
@@ -79,12 +83,12 @@ P amätáš si moje meno?`,
     },
     onsite: {
       title: 'Úloha na mieste',
-      text: 'Pozoruj sochu a odpovedz na otázky. Na konci zadaj 3-ciferný kód.',
+      text: 'Pozoruj sochu a odpovedz na otázky. Zadaj výsledný 3-ciferný kód.',
       fields: [
-        { label: '🖐 Koľkými prstami sa drží okraja studne?', placeholder: 'Číslo...' },
-        { label: '🎩 Čo má na hlave? (cylinder = 1)',         placeholder: 'Číslo...' },
-        { label: '✋ Čo drží v druhej ruke? (nič = 0)',       placeholder: 'Číslo...' },
-        { label: '🔑 Výsledný 3-ciferný kód',                placeholder: 'Kód...' }
+        { label: '🖐 Koľkými prstami sa drží okraja studne?', placeholder: 'Číslo...', answer: '5',   required: false },
+        { label: '🎩 Čo má na hlave?',                        placeholder: 'Číslo...', answer: '1',   required: false },
+        { label: '✋ Čo drží v druhej ruke?',                 placeholder: 'Číslo...', answer: '0',   required: false },
+        { label: '🔑 Výsledný 3-ciferný kód',                placeholder: 'Kód...',   answer: '510', required: true  }
       ]
     }
   },
@@ -105,9 +109,14 @@ P amätáš si moje meno?`,
     },
     onsite: {
       title: 'Úloha na mieste',
-      text: 'Pozri sa na budovu a odpovedz.',
+      text: 'Pozri sa na hornú časť budovy.',
       fields: [
-        { label: 'Aký geometrický tvar dominuje v hornej časti budovy?', placeholder: 'Tvar...' }
+        {
+          label: 'Aký geometrický tvar dominuje v hornej časti budovy?',
+          placeholder: 'Tvar...',
+          answer: 'HVIEZDA',      // test value — Davids star
+          required: true
+        }
       ]
     }
   },
@@ -138,8 +147,11 @@ const ROUTES = {
   2: ['synagoga', 'vodnik', 'stolp', 'hotel', 'hrad']
 };
 
-// Trenčín hrad coords for prize map
-const PRIZE_COORDS = { lat: 48.8944, lng: 18.0440, label: 'Trenčínsky hrad — tu čaká vaša cena!' };
+const PRIZE_COORDS = {
+  lat: 48.8944,
+  lng: 18.0440,
+  label: 'Trenčínsky hrad — tu čaká vaša cena!'
+};
 
 const MORSE_TABLE = [
   ['A','·—'],  ['B','—···'],['C','—·—·'],['D','—··'],

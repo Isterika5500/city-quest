@@ -56,12 +56,12 @@ function buildProgressDots() {
 
 function updateProgress() {
   const total = state.route.length;
-  const pct = (state.currentStop / (total - 1)) * 100;
+  const pct   = (state.currentStop / (total - 1)) * 100;
   document.getElementById('progress-bar').style.width = pct + '%';
-  document.getElementById('stop-counter').textContent = `${state.currentStop + 1} / ${total}`;
+  document.getElementById('stop-counter').textContent  = `${state.currentStop + 1} / ${total}`;
 
   document.querySelectorAll('.progress-dot').forEach((dot, i) => {
-    dot.classList.toggle('done', i < state.currentStop);
+    dot.classList.toggle('done',   i < state.currentStop);
     dot.classList.toggle('active', i === state.currentStop);
   });
 
@@ -73,12 +73,12 @@ function updateProgress() {
 
 function renderStop() {
   const stopId = state.route[state.currentStop];
-  const stop = STOPS[stopId];
-  const main = document.getElementById('game-main');
+  const stop   = STOPS[stopId];
+  const main   = document.getElementById('game-main');
   updateProgress();
 
   let html = '';
-  if (state.phase === 'puzzle')      html = renderPuzzlePhase(stop);
+  if      (state.phase === 'puzzle') html = renderPuzzlePhase(stop);
   else if (state.phase === 'onsite') html = renderOnsitePhase(stop);
   else if (state.phase === 'map')    html = renderMapPhase();
 
@@ -94,8 +94,6 @@ function renderPuzzlePhase(stop) {
   const p = stop.puzzle;
 
   let extras = '';
-
-  // Morse table
   if (p.morseTable) {
     extras += `
       <button class="btn-toggle" onclick="toggleTable('morse-table')">📋 Morseova tabuľka</button>
@@ -109,8 +107,6 @@ function renderPuzzlePhase(stop) {
         </div>
       </div>`;
   }
-
-  // Binary table
   if (p.binaryTable) {
     extras += `
       <button class="btn-toggle" onclick="toggleTable('binary-table')">📋 Binárna tabuľka</button>
@@ -128,7 +124,6 @@ function renderPuzzlePhase(stop) {
   const hint  = p.hint  ? `<div class="hint-box">💡 ${p.hint}</div>` : '';
   const hint2 = p.hint2 ? `<div class="hint-box hint-box--roman">🏛 ${p.hint2}</div>` : '';
 
-  // Synagóga: cipher rendered inside blue info-box instead of dark cipher-box
   const isSynagoga = stop.id === 'synagoga';
   const cipherHtml = isSynagoga
     ? `<div class="info-box">
@@ -179,23 +174,45 @@ function renderPuzzlePhase(stop) {
 
 function renderOnsitePhase(stop) {
   const o = stop.onsite;
-  const isLastStop = state.currentStop === state.route.length - 1;
-  // Last stop (hrad) has no onsite, so this only fires for non-final stops
-  const btnLabel = 'Ďalšia zastávka →';
 
-  const fields = (o.fields || []).map((f, i) => `
-    <div class="field-group">
-      <label class="field-label">${f.label}</label>
-      <input
-        type="text"
-        class="field-input"
-        id="field-${i}"
-        placeholder="${f.placeholder}"
-        autocomplete="off"
-        autocorrect="off"
-        spellcheck="false"
-      />
-    </div>`).join('');
+  // Build fields — required ones get a check button, others are free-text notes
+  const fieldsHtml = (o.fields || []).map((f, i) => {
+    if (f.required) {
+      return `
+        <div class="field-group" id="fg-${i}">
+          <label class="field-label">${f.label}</label>
+          <div class="field-row">
+            <input
+              type="text"
+              class="field-input"
+              id="field-${i}"
+              placeholder="${f.placeholder}"
+              autocomplete="off"
+              autocorrect="off"
+              spellcheck="false"
+              oninput="onFieldInput()"
+              onkeydown="if(event.key==='Enter') checkOnsiteField(${i})"
+            />
+            <button class="btn-field-check" id="fcheck-${i}" onclick="checkOnsiteField(${i})">✓</button>
+          </div>
+          <div class="field-feedback hidden" id="ff-${i}"></div>
+        </div>`;
+    } else {
+      return `
+        <div class="field-group">
+          <label class="field-label">${f.label}</label>
+          <input
+            type="text"
+            class="field-input"
+            id="field-${i}"
+            placeholder="${f.placeholder}"
+            autocomplete="off"
+            autocorrect="off"
+            spellcheck="false"
+          />
+        </div>`;
+    }
+  }).join('');
 
   return `
     <div class="stop-card">
@@ -212,14 +229,69 @@ function renderOnsitePhase(stop) {
       <div class="onsite-section">
         <div class="section-label">${o.title}</div>
         <p class="onsite-text">${o.text}</p>
-        <div class="fields-wrap">${fields}</div>
+        <div class="fields-wrap">${fieldsHtml}</div>
       </div>
 
-      <button class="btn-next" onclick="nextStop()">${btnLabel}</button>
+      <button class="btn-next" id="btn-next-onsite" onclick="nextStop()" disabled>
+        Ďalšia zastávka →
+      </button>
     </div>`;
 }
 
-// ── Phase: MAP (prize location) ───────────────────────────────
+// ── Onsite field check ────────────────────────────────────────
+
+function normalize(s) {
+  return String(s).trim().toUpperCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^A-Z0-9]/g, '');
+}
+
+function checkOnsiteField(i) {
+  const stop  = STOPS[state.route[state.currentStop]];
+  const field = stop.onsite.fields[i];
+  const input = document.getElementById(`field-${i}`);
+  const fb    = document.getElementById(`ff-${i}`);
+  const btn   = document.getElementById(`fcheck-${i}`);
+
+  if (normalize(input.value) === normalize(field.answer)) {
+    fb.className = 'field-feedback correct';
+    fb.textContent = '✓ Správne!';
+    input.disabled = true;
+    btn.disabled   = true;
+    input.classList.add('field-correct');
+    checkAllRequiredDone();
+  } else {
+    fb.className = 'field-feedback wrong';
+    fb.textContent = '✗ Skús znova...';
+    input.classList.add('shake');
+    setTimeout(() => input.classList.remove('shake'), 400);
+  }
+}
+
+// Check if all required fields are solved → unlock next button
+function checkAllRequiredDone() {
+  const stop     = STOPS[state.route[state.currentStop]];
+  const required = stop.onsite.fields.filter(f => f.required);
+  const allDone  = required.every((f, i) => {
+    // find the real index in the full fields array
+    const realIdx = stop.onsite.fields.indexOf(f);
+    const input   = document.getElementById(`field-${realIdx}`);
+    return input && input.disabled;
+  });
+
+  if (allDone) {
+    const btn = document.getElementById('btn-next-onsite');
+    if (btn) {
+      btn.disabled = false;
+      btn.classList.add('btn-next--unlocked');
+    }
+  }
+}
+
+// Not used for locking but kept for optional free-text fields
+function onFieldInput() {}
+
+// ── Phase: MAP ────────────────────────────────────────────────
 
 function renderMapPhase() {
   const c = PRIZE_COORDS;
@@ -251,34 +323,24 @@ function renderMapPhase() {
           ></iframe>
         </div>
 
-        <div class="map-coords">
-          <span>📍 ${c.lat}, ${c.lng}</span>
-        </div>
+        <div class="map-coords">📍 ${c.lat}, ${c.lng}</div>
       </div>
 
       <div class="map-buttons">
-        <a class="btn-map" href="${mapsUrl}" target="_blank">
-          🗺 Otvoriť v Google Maps
-        </a>
-        <a class="btn-map btn-map--waze" href="${wazeUrl}" target="_blank">
-          🚗 Navigovať vo Waze
-        </a>
+        <a class="btn-map" href="${mapsUrl}" target="_blank">🗺 Otvoriť v Google Maps</a>
+        <a class="btn-map btn-map--waze" href="${wazeUrl}" target="_blank">🚗 Navigovať vo Waze</a>
       </div>
 
       <button class="btn-next" onclick="showFinish()">🏅 Dokončiť hru</button>
     </div>`;
 }
 
-// ── Answer Check ──────────────────────────────────────────────
+// ── Puzzle answer check ───────────────────────────────────────
 
 function checkAnswer() {
   const input    = document.getElementById('answer-input');
   const feedback = document.getElementById('answer-feedback');
   const stop     = STOPS[state.route[state.currentStop]];
-
-  const normalize = s => s.trim().toUpperCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^A-Z0-9]/g, '');
 
   if (normalize(input.value) === normalize(stop.puzzle.answer)) {
     feedback.className = 'answer-feedback correct';
@@ -295,11 +357,7 @@ function checkAnswer() {
           </button>`);
       }, 500);
     } else {
-      // Final stop — go to map screen
-      setTimeout(() => {
-        state.phase = 'map';
-        renderStop();
-      }, 900);
+      setTimeout(() => { state.phase = 'map'; renderStop(); }, 900);
     }
   } else {
     feedback.className = 'answer-feedback wrong';

@@ -520,3 +520,57 @@ body {
   border-color: var(--gray-200);
 }
 .btn-map--waze:active { background: var(--gray-100); }
+
+/* ── Onsite field with check button ─────────────────── */
+
+.field-row {
+  display: flex;
+  gap: 0.5rem;
+}
+.field-row .field-input { flex: 1; }
+
+.btn-field-check {
+  width: 44px;
+  background: var(--blue-600);
+  border: none;
+  border-radius: var(--r-sm);
+  color: var(--white);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s;
+}
+.btn-field-check:active { background: var(--blue-800); }
+.btn-field-check:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.field-feedback {
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--r-sm);
+  margin-top: 0.3rem;
+  animation: fadeUp 0.2s ease;
+}
+.field-feedback.hidden  { display: none; }
+.field-feedback.correct { background: var(--green-bg); color: var(--green-tx); }
+.field-feedback.wrong   { background: var(--red-bg);   color: var(--red-tx); }
+
+.field-correct {
+  border-color: #6abf6a !important;
+  background: var(--green-bg) !important;
+}
+
+/* ── Next button locked / unlocked ──────────────────── */
+
+.btn-next:disabled {
+  background: var(--gray-200);
+  color: var(--gray-400);
+  cursor: not-allowed;
+}
+.btn-next--unlocked {
+  background: var(--blue-600) !important;
+  color: var(--white) !important;
+  animation: fadeUp 0.3s ease;
+}
