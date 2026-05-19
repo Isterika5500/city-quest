@@ -20,12 +20,12 @@ const STOPS = {
     },
     onsite: {
       title: 'Úloha na mieste',
-      text: 'Si pred budovou. Spočítaj vlajky na fasáde hotela.',
+      text: 'Z ktorých susedných krajín môžu pricestovať hostia do Hotel Elizabeth?',
       fields: [
         {
-          label: '🚩 Koľko vlajok je na fasáde hotela?',
-          placeholder: 'Počet vlajok...',
-          answer: '10',           // test value — change to real count
+          label: 'Napíšte všetky krajiny, s ktorými susedí Slovensko.',
+          placeholder: 'Napíšte krajiny...',
+          answer: 'POĽSKO, MAĎARSKO, ČESKO, RAKÚSKO, UKRAJINA',           // test value — change to real count
           required: true
         }
       ]
@@ -114,7 +114,7 @@ Pamätáš si moje meno?`,
         {
           label: 'Aký geometrický tvar dominuje v hornej časti budovy?',
           placeholder: 'Tvar...',
-          answer: 'HVIEZDA',      // test value — Davids star
+          answer: 'KUPOLA',      // test value — Davids star
           required: true
         }
       ]
