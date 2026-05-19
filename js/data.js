@@ -147,11 +147,7 @@ const ROUTES = {
   2: ['synagoga', 'vodnik', 'stolp', 'hotel', 'hrad']
 };
 
-const PRIZE_COORDS = {
-  lat: 48.8944,
-  lng: 18.0440,
-  label: 'Trenčínsky hrad — tu čaká vaša cena!'
-};
+const PRIZE_COORDS = { lat: 48.8938464, lng: 18.0405694, label: '!' };
 
 const MORSE_TABLE = [
   ['A','·—'],  ['B','—···'],['C','—·—·'],['D','—··'],
